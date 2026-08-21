@@ -1,0 +1,18 @@
+{
+  "name": "@webhook/worker",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch --env-file=../../.env src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@webhook/shared": "workspace:*",
+    "bullmq": "^5.12.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

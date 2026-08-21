@@ -1,0 +1,22 @@
+# Reference only — merge the bits you need into your own docker-compose.yml.
+# api and worker run via `pnpm dev` on the host for fast reloads; only the
+# stateful pieces (redis, postgres) run in containers.
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: webhooks
+    ports:
+      - "5433:5432"
+    volumes:
+      - webhook_pg_data:/var/lib/postgresql/data
+
+volumes:
+  webhook_pg_data:

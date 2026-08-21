@@ -16,11 +16,11 @@ async function run() {
 
       const { rows: eventRows } = await pool.query(
         `SELECT * FROM events WHERE id = $1`,
-        [eventId],
+        [eventId]
       );
       const { rows: subRows } = await pool.query(
         `SELECT * FROM subscriptions WHERE id = $1`,
-        [subscriptionId],
+        [subscriptionId]
       );
 
       const event = eventRows[0];
@@ -34,11 +34,7 @@ async function run() {
         const res = await fetch(subscription.target_url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: event.id,
-            type: event.type,
-            payload: event.payload,
-          }),
+          body: JSON.stringify({ id: event.id, type: event.type, payload: event.payload }),
         });
         statusCode = res.status;
         status = res.ok ? "delivered" : "failed";
@@ -49,15 +45,14 @@ async function run() {
       await pool.query(
         `INSERT INTO deliveries (event_id, subscription_id, status, status_code, attempt)
          VALUES ($1, $2, $3, $4, $5)`,
-        [eventId, subscriptionId, status, statusCode, job.attemptsMade],
+        [eventId, subscriptionId, status, statusCode, job.attemptsMade]
       );
 
-      // Throwing on failure lets BullMQ's retry/backoff (configured at
-      // enqueue time) take over instead of us reimplementing it here.
-      if (status === "failed")
-        throw new Error(`delivery failed (${statusCode ?? "network error"})`);
+      // Throwing hands control back to BullMQ, which applies the retry/
+      // backoff settings configured when the job was enqueued.
+      if (status === "failed") throw new Error(`delivery failed (${statusCode ?? "network error"})`);
     },
-    { connection },
+    { connection }
   );
 
   console.log("worker listening for delivery jobs");

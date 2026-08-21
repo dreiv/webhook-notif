@@ -4,8 +4,8 @@ export const pool = new Pool({
   connectionString: process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/webhooks",
 });
 
-// Minimal schema, created on boot. Fine for a tutorial repo; use real
-// migrations (e.g. node-pg-migrate) once this grows past a toy project.
+// Bootstraps the schema on boot instead of using migrations — fine here,
+// swap for real migrations (e.g. node-pg-migrate) in a production project.
 export async function ensureSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS events (
